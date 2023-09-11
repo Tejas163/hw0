@@ -47,9 +47,39 @@ def parse_mnist(image_filename, label_filename):
                 labels of the examples.  Values should be of type np.uint8 and
                 for MNIST will contain the values 0-9.
     """
-    ### BEGIN YOUR CODE
-    pass
-    ### END YOUR CODE
+  import gzip
+import numpy as np
+
+def read_mnist_data(image_filename, label_filename):
+    # Read images file
+    with gzip.open(image_filename, 'rb') as f:
+        # Read the header information
+        magic_number = int.from_bytes(f.read(4), 'big')
+        num_images = int.from_bytes(f.read(4), 'big')
+        num_rows = int.from_bytes(f.read(4), 'big')
+        num_cols = int.from_bytes(f.read(4), 'big')
+
+        # Read the image data
+        image_data = f.read()
+
+    # Read labels file
+    with gzip.open(label_filename, 'rb') as f:
+        # Read the header information
+        magic_number = int.from_bytes(f.read(4), 'big')
+        num_labels = int.from_bytes(f.read(4), 'big')
+
+        # Read the label data
+        label_data = f.read()
+
+    # Convert image data to numpy array
+    image_array = np.frombuffer(image_data, dtype=np.uint8, offset=16)
+    image_array = image_array.reshape(num_images, num_rows * num_cols)
+    image_array = image_array.astype(np.float32) / 255.0
+
+    # Convert label data to numpy array
+    label_array = np.frombuffer(label_data, dtype=np.uint8, offset=8)
+
+    return image_array, label_array
 
 
 def softmax_loss(Z, y):
